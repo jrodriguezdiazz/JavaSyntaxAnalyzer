@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package codigo;
 
 import java.io.File;
@@ -11,40 +6,37 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- *
- * @author Charly Ponce
- */
-public class Principal {
+
+public class Principal  {
     public static void main(String[] args) throws Exception {
-        String ruta1 = "C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/Lexer.flex";
-        String ruta2 = "C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/LexerCup.flex";
-        String[] rutaS = {"-parser", "Sintax", "C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/Sintax.cup"};
-        generar(ruta1, ruta2, rutaS);
+        String flexLexerPath = "src/code/Lexer.flex";
+        String flexCupPath = "src/code/LexerCup.flex";
+        String[] cupOptions = {"-parser", "Syntax", "src/code/Syntax.cup"};
+
+        generateLexerAndParser(flexLexerPath, flexCupPath, cupOptions);
     }
-    public static void generar(String ruta1, String ruta2, String[] rutaS) throws IOException, Exception{
-        File archivo;
-        archivo = new File(ruta1);
-        JFlex.Main.generate(archivo);
-        archivo = new File(ruta2);
-        JFlex.Main.generate(archivo);
-        java_cup.Main.main(rutaS);
-        
-        Path rutaSym = Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/sym.java");
-        if (Files.exists(rutaSym)) {
-            Files.delete(rutaSym);
+
+    private static void generateLexerAndParser(String lexerPath, String cupLexerPath, String[] cupOptions) throws IOException, Exception {
+        generateFile(lexerPath);
+        generateFile(cupLexerPath);
+        java_cup.Main.main(cupOptions);
+
+        moveFileToDirectory("sym.java", "src/code/sym.java");
+        moveFileToDirectory("Syntax.java", "src/code/Syntax.java");
+    }
+
+    private static void generateFile(String filePath) throws IOException, Exception {
+        File file = new File(filePath);
+        JFlex.Main.generate(file);
+    }
+
+    private static void moveFileToDirectory(String sourceFileName, String destinationFileName) throws IOException {
+        Path sourcePath = Paths.get(sourceFileName);
+        Path destinationPath = Paths.get(destinationFileName);
+
+        if (Files.exists(destinationPath)) {
+            Files.delete(destinationPath);
         }
-        Files.move(
-                Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/sym.java"), 
-                Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/sym.java")
-        );
-        Path rutaSin = Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/Sintax.java");
-        if (Files.exists(rutaSin)) {
-            Files.delete(rutaSin);
-        }
-        Files.move(
-                Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/Sintax.java"), 
-                Paths.get("C:/Users/jrodr/Desktop/AnalizadorLexico/src/codigo/Sintax.java")
-        );
+        Files.move(sourcePath, destinationPath);
     }
 }
